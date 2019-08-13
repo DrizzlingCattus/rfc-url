@@ -1,0 +1,14 @@
+{
+  "name": "rfc-url",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "DrizzlingCattus",
+  "license": "MIT"
+}
