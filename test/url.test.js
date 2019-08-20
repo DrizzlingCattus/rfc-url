@@ -3,17 +3,17 @@ const { formPredicator, formSelector } = require('../src/url.js');
 
 describe('formPredicator', () => {
     const testcases = {
-        
+
     };
 });
 
 describe('formSelector', () => {
-    const testcases = { 
+    const testcases = {
         genericUrl: [
             {
                 data: 'http://user_name:pass-word@test.my-url.or.kr:2019/first/second/last?query=ab&param=12',
                 answer: {
-                    scheme: 'http', 
+                    scheme: 'http',
                     schemePart: '//user_name:pass-word@test.my-url.or.kr:2019/first/second/last?query=ab&param=12'
                 },
             },
@@ -75,6 +75,16 @@ describe('formSelector', () => {
             {
                 data: 'test.my-url.or.kr',
                 answer: 'test.my-url.or.kr',
+            },
+        ],
+        port: [
+            {
+                data: '',
+                answer: '',
+            },
+            {
+                data: '2019',
+                answer: '2019',
             },
         ],
     };
@@ -142,7 +152,7 @@ describe('formSelector', () => {
             expect(formSelector.login(testcase.data))
                 .toEqual(testcase.answer);
         });
-        
+
         errorTestcases.login.map((testcase) => {
             expect(() => formSelector.login(testcase.data))
                 .toThrow();
@@ -154,7 +164,7 @@ describe('formSelector', () => {
             expect(formSelector.hostport(testcase.data))
                 .toEqual(testcase.answer);
         });
-        
+
         errorTestcases.hostport.map((testcase) => {
             expect(() => formSelector.hostport(testcase.data))
                 .toThrow();
@@ -164,6 +174,13 @@ describe('formSelector', () => {
     test('::host', () => {
         testcases.host.map((testcase) => {
             expect(formSelector.host(testcase.data))
+                .toEqual(testcase.answer);
+        });
+    });
+
+    test('::port', () => {
+        testcases.port.map((testcase) => {
+            expect(formSelector.port(testcase.data))
                 .toEqual(testcase.answer);
         });
     });

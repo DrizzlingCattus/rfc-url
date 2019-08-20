@@ -1,3 +1,5 @@
+const debug = require('debug')('rfc-url:url');
+
 const MESSAGE = {
     INVALID_BNF: (part, type) => `${part} is not vaild ${type} BNF form`,
 };
@@ -129,7 +131,7 @@ formPredicator.isHostNumber = (raw) => {
     if (digitsList.length !== 4) {
         return false;
     }
-    
+
     let isHostNumber = true;
     digitsList.map((digits) => {
         if (!formPredicator.isDigits(digits)) {
@@ -170,7 +172,7 @@ formPredicator.isToplabel = (raw) => {
     Array.from(raw).map((char, i) => {
         const isAlpha = formPredicator.isAlpha(char);
         const isAlphaDigit = formPredicator.isAlphaDigit(char);
-        if ((i === 0 && !isAlpha) || 
+        if ((i === 0 && !isAlpha) ||
             (i === endIndex && !isAlphaDigit)) {
             isToplabel = false;
         } else if (char !== '-' &&
@@ -446,7 +448,7 @@ formSelector.urlPath = (fromUrlPath) => {
     } else {
         path = fromUrlPath.slice();
     }
-    console.log(path);
+    debug('path and query is', path, query);
     return {
         path,
         query,
@@ -459,7 +461,12 @@ const SCHEME_TYPE = {
     FILE: 'file',
 };
 
-const Url = function(chunk) {
+const SCHEME_PORT = {
+    HTTP: 80,
+    HTTPS: 443,
+};
+
+const Url = function Url(chunk) {
     const self = this;
 
     const genericChunks = formSelector.genericUrl(chunk);
@@ -471,19 +478,11 @@ const Url = function(chunk) {
     const loginChunks = formSelector.login(schemePartChunks.login);
     self.user = formSelector.user(loginChunks.user);
     self.password = formSelector.password(loginChunks.password);
+
     const hostportChunks = formSelector.hostport(loginChunks.hostport);
     self.host = formSelector.host(hostportChunks.host);
-    self.port = formSelector.port(hostportChunks.port) - 0;
-
-    if (self.port === 0) {
-        if (self.scheme === SCHEME_TYPE.HTTP) {
-            self.port = 80;
-        } else if (self.scheme === SCHEME_TYPE.HTTPS) {
-            self.port = 443;
-        } else {
-            self.port = null;
-        }
-    }
+    self.port = formSelector.port(hostportChunks.port);
+    self.port = matchPortWithScheme(self.port);
 
     const urlPathChunks = formSelector.urlPath(schemePartChunks.urlPath);
 
@@ -498,6 +497,23 @@ const Url = function(chunk) {
 
     self.absoluteString = chunk.slice();
     return self;
+
+    /* private */
+    function matchPortWithScheme(port, scheme) {
+        // default port value is '' and '' - 0 is 0.
+        const isNotAssign = (port - 0) === 0;
+
+        if (isNotAssign) {
+            if (scheme === SCHEME_TYPE.HTTP) {
+                return SCHEME_PORT.HTTP;
+            } else if (scheme === SCHEME_TYPE.HTTPS) {
+                return SCHEME_PORT.HTTPS;
+            } else {
+                return null;
+            }
+        }
+        return port - 0;
+    }
 }
 
 module.exports = {

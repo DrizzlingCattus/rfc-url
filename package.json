@@ -10,5 +10,8 @@
     "test": "jest"
   },
   "author": "DrizzlingCattus",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "debug": "^4.1.1"
+  }
 }
