@@ -448,7 +448,6 @@ formSelector.urlPath = (fromUrlPath) => {
     } else {
         path = fromUrlPath.slice();
     }
-    debug('path and query is', path, query);
     return {
         path,
         query,
@@ -470,21 +469,29 @@ const Url = function Url(chunk) {
     const self = this;
 
     const genericChunks = formSelector.genericUrl(chunk);
+    debug('genericUrl is', genericChunks);
+
     self.scheme = formSelector.scheme(genericChunks.scheme);
     self.isFileURL = SCHEME_TYPE.FILE === self.scheme;
 
     const schemePartChunks = formSelector.schemePart(genericChunks.schemePart);
+    debug('schemePart is', schemePartChunks);
 
     const loginChunks = formSelector.login(schemePartChunks.login);
+    debug('login is', loginChunks);
+
     self.user = formSelector.user(loginChunks.user);
     self.password = formSelector.password(loginChunks.password);
 
     const hostportChunks = formSelector.hostport(loginChunks.hostport);
+    debug('hostport is', hostportChunks);
+
     self.host = formSelector.host(hostportChunks.host);
     self.port = formSelector.port(hostportChunks.port);
     self.port = matchPortWithScheme(self.port);
 
     const urlPathChunks = formSelector.urlPath(schemePartChunks.urlPath);
+    debug('urlPath is', urlPathChunks);
 
     // in RFC 1738, there is no comment for query
     // so it just use sliced chunk, not verified
@@ -492,7 +499,6 @@ const Url = function Url(chunk) {
 
     self.pathComponents = urlPathChunks.path.split('/');
     self.pathComponents.unshift('/');
-
     self.lastPathComponent = self.pathComponents[self.pathComponents.length - 1];
 
     self.absoluteString = chunk.slice();
@@ -514,10 +520,10 @@ const Url = function Url(chunk) {
         }
         return port - 0;
     }
-}
+};
 
 module.exports = {
     Url,
     formPredicator,
     formSelector,
-}
+};
