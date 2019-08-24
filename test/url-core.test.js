@@ -1,5 +1,4 @@
-
-const { formPredicator, formSelector } = require('../src/url.js');
+const { formPredicator, formSelector } = require('../src/url-core.js');
 
 describe('formPredicator', () => {
     const testcases = {
