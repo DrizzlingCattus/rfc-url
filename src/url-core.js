@@ -284,10 +284,13 @@ formSelector.schemePart = (fromSchemePart) => {
     if (formPredicator.isXchars(fromSchemePart)) {
         xchars = { xchars: fromSchemePart };
     }
-    const loginWithUrlPath = fromSchemePart.split("//").filter((v) => v !== '');
-    // ["login/urlpath"]
-    if (loginWithUrlPath.length !== 1) {
-        // there is more double slash, so it can be xchars
+    const doubleSlashSplits = fromSchemePart.split("//").filter((v) => v !== '');
+    const hasMoreThanTwoSlash = doubleSlashSplits.length !== 1;
+
+    // formSchemePart = login/urlpath
+    // if / is more than two, then the left choice is xchars
+    // because xchar can contain /, so it can have more than two /
+    if (hasMoreThanTwoSlash) {
         if (xchars) {
             return xchars;
         }
@@ -296,14 +299,17 @@ formSelector.schemePart = (fromSchemePart) => {
             BNF_TYPE.SCHEME_PART,
         ));
     }
-    let urlPathStart = loginWithUrlPath[0].indexOf('/');
-    if (urlPathStart === -1) {
-        urlPathStart = loginWithUrlPath[0].length;
+    const loginWithUrlPath = doubleSlashSplits[0];
+    let urlPathStart = loginWithUrlPath.indexOf('/');
+
+    const noUrlPath = urlPathStart === -1;
+    if (noUrlPath) {
+        urlPathStart = loginWithUrlPath.length;
     }
     // ["login/urlpath"] => "login"
-    const login = loginWithUrlPath[0].slice(0, urlPathStart);
+    const login = loginWithUrlPath.slice(0, urlPathStart);
     // ["login/urlpath"] => "urlpath"
-    const urlPath = loginWithUrlPath[0].slice(urlPathStart + 1);
+    const urlPath = loginWithUrlPath.slice(urlPathStart + 1);
     return { login, urlPath };
 };
 
